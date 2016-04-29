@@ -1,0 +1,53 @@
+sanitise message showing.
+  $headline = $row["headline"];
+  $message = $row["Message"];
+  $allowed_tags =
+    '<a><br><b><h1><h2><h3><h4><i><img><li><ol><p><strong><table>' .
+    '<tr><td><th><u><ul><em><span>';
+  $message = strip_tags($message, $allowed_tags);
+  $headline = strip_tags($headline, $allowed_tags);
+  $disallowed =
+          'javascript:|window|eval|setTimeout|setInterval|target|'.
+          'onAbort|onBlur|onChange|onClick|onDblClick|'.
+          'onDragDrop|onError|onFocus|onKeyDown|onKeyPress|'.
+          'onKeyUp|onLoad|onMouseDown|onMouseMove|onMouseOut|'.
+          'onMouseOver|onMouseUp|onMove|onReset|onResize|'.
+          'onSelect|onSubmit|onUnload';
+  $headline = preg_replace("/$disallowed/i", " ", $headline);
+  $mesage = preg_replace("/$disallowed/i", " ", $message);
+?>
+    <p><?php echo $headline; ?></p>
+    <p><?php echo $message; ?></p>
+
+
+
+
+
+Added check to transfer post.
+&& strcmp($_SERVER['HTTP_REFERER'], 'http://localhost/transfer.php') == 0
+
+
+
+
+
+
+
+
+
+
+fix whiteboxing
+$sql = "INSERT INTO Message (FromID, ToID, Headline, Message) " .
+       " VALUES ('$from', '$to', '$headline', '$message')";
+if (!$db->query($sql)) {
+    die("Making message failed: (" . $db->errno . ") " . $db->error);
+}
+
+
+$sql2 = "INSERT INTO Message (FromID, ToID, Headline, Message) " .
+        " VALUES (?,?,?,?)";
+if($stmt = mysqli_prepare($db,$sql2)){
+  mysqli_stmt_bind_param($stmt, "iiss", $from,$to,$headline,$message
+  mysqli_stmt_execute($stmt);
+} else {
+    die("Making message failed: (" . $db->errno . ") " . $db->error);
+}
