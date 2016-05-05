@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage [danish]{babel}
+\usepackage[a4paper, hmargin={2.8cm, 2.8cm}, vmargin={2.5cm, 2.5cm}]{geometry}
+\usepackage{eso-pic} % \AddToShipoutPicture
+\usepackage{graphicx} % \includegraphics
+\linespread{1.2}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{amsfonts}
+\usepackage{listings}
+\lstset{literate=
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\EUR}}1 {£}{{\pounds}}1
+}
+\author{
+\Large{dpj482}\\
+    \\ \texttt{}
+}
+
+\title{
+  \vspace{3cm}
+  \Huge{TITEL} \\
+  \Large{Christian Møllgaard}\\
+}
+\usepackage{natbib}
+\usepackage{graphicx}
+
+\begin{document}
+
+%% Change `ku-farve` to `nat-farve` to use SCIENCE's old colors or
+%% `natbio-farve` to use SCIENCE's new colors and logo.
+\AddToShipoutPicture*{\put(0,0){\includegraphics*[viewport=0 0 700 600]{natbio-farve}}}
+\AddToShipoutPicture*{\put(0,602){\includegraphics*[viewport=0 600 700 1600]{natbio-farve}}}
+
+%% Change `ku-en` to `nat-en` to use the `Faculty of Science` header
+\AddToShipoutPicture*{\put(0,0){\includegraphics*{nat-en}}}
+
+\clearpage\maketitle
+\thispagestyle{empty}
+
+\newpage
+\section{Blackbox}
+\subsection{Attack A}
+The goal here was to send malicious a message to another user. The message should some code that got executed once the message is opened.
+
+To do this i created a modified version of the form found when viewing the source page messages.php in firefox. I converted all the forms so they were hidden. I inserted all the values that i wanted as default. Using javascript i then inserted the targets cookie into the message field before submitting the form.
+
+Doing only this the browser would redirect back to the messages page, which would alert the user that something was wrong. To handle this i created an invisible iframe, that i then targeted the submit in, so the redirect would be done in another frame. This way the user could see what ever message i sent, without knowing that something is wrong.
+
+The message i sent looks like this:
+
+\lstinputlisting[language=HTML]{../part1.txt}
+\subsection{Attack B}
+The goal here was to create a local HTML file that a user opens. Th escript is the supposed to send coins to another uer named "you". The user is already logged in to barbar bar.
+
+I accomplished this in the same was as attack A. Only difference was, that I used a function to catch a return value from submitting the form, that was sending the user to http://localhost/transfer.
+
+
+\lstinputlisting[language=HTML]{../part2.html}
+
+\section{White boxing}
+\subsection{Objective 1}
+I needed to find a list of users and their password. I found that using the messge system I could copletly overwrite was would be put into the message field. So i created an sql that gathered all users, passwords, and their salt and placed it in the message field. I just sent a message to "you" with the following message in the headline:
+
+\lstinputlisting[language=HTML, firstline=4, lastline=9]{../whiteboxing.txt}
+This got me a result that looks like 
+\lstinputlisting[language=HTML, firstline=12, lastline=18]{../whiteboxing.txt}
+Which is formated like:\\
+Username\&Password\&Salt
+
+\subsection{Objective B}
+I needed to replace the password of the user "br0ns". I decided to change the password to mastermind, which is the same password used by the user "you". To do this i needed an update query. In index.php there is an query to update the profile of a user. I used this to update more than just the profile, and changed it so it did not update the current users variables, but the variables of "br0ns".
+
+The query typed into the update profile box was this:
+\lstinputlisting[language=HTML, firstline=23, lastline=24]{../whiteboxing.txt}
+
+
+\section{Fixing the attacks}
+\subsection{Attack A}
+To fix attack A, i copied the javascript sanitation from elsewhere in the code, and put it on both the headline and the message when viewing messages. I copied the sanitation from the sanitation of headlines in messages.php.
+\subsection{Attack B}
+To fix attack B, I check whether or not the transfer is initiated from "http:/localhost/transfer.php" which is the usual referrer. This can probably still be exploited, by messing the browser or some other hacks, but it fixes my exploit. The added check when making a transfer is this:
+\lstinputlisting[language=HTML, firstline=27, lastline=27]{../fixes.txt}
+\subsection{SQL attack}
+To fix my SQL injections, I simply need to prepare the statements. To fix the find users attack, I converted the message post to look like this:
+\lstinputlisting[language=HTML, firstline=46, lastline=53]{../fixes.txt}
+
+\section{Appendix}
+Attack A is located in part1.txt
+
+Attack B is located in part2.html
+
+Both whiteboxing attacks are located in whiteboxing.txt
+
+Fixes are shortly explained in fixes.txt
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
