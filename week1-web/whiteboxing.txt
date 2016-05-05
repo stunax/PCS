@@ -20,4 +20,5 @@ you&5a8441c3702aacd4103fd8675692f015&evil
 
 attack2
 Sæt profile. br0ns har nu password mastermind
-derp',Password='5a8441c3702aacd4103fd8675692f015',Salt='evil' WHERE Username='br0ns' #
+derp',Password='5a8441c3702aacd4103fd8675692f015',
+	Salt='evil' WHERE Username='br0ns' #
