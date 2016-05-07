@@ -41,4 +41,4 @@ makeData1:
   db "Hello, World!", 10
 makeData2:
   call ls
-  db "/bin/ls -l " ;xxxx is pointer to path, YYYY is char pointer array, ZZZZ becomes nulls
+  db "/bin/ls -l " 

@@ -32,7 +32,7 @@
 
 \title{
   \vspace{3cm}
-  \Huge{TITEL} \\
+  \Huge{PCS assignment 2} \\
   \Large{Christian Møllgaard}\\
 }
 \usepackage{natbib}
@@ -52,60 +52,38 @@
 \thispagestyle{empty}
 
 \newpage
-\section{Blackbox}
-\subsection{Attack A}
-The goal here was to send malicious a message to another user. The message should some code that got executed once the message is opened.
+\section{Shellcode}
+I have chosen to complete exercise 1,2, and 3
+\subsection{exercise 1}
+After a talk with kristoffer, we decided to use ls with option -l instead of WAll, because WAll had another setup on my system. 
 
-To do this i created a modified version of the form found when viewing the source page messages.php in firefox. I converted all the forms so they were hidden. I inserted all the values that i wanted as default. Using javascript i then inserted the targets cookie into the message field before submitting the form.
+I have already allocated the space for both the hello world print and the string used to call ls. I leave a space between "/bin/ls" and "-l" and after "-l" because i later use this already allocated space for the null bytes required for the strings.
 
-Doing only this the browser would redirect back to the messages page, which would alert the user that something was wrong. To handle this i created an invisible iframe, that i then targeted the submit in, so the redirect would be done in another frame. This way the user could see what ever message i sent, without knowing that something is wrong.
+The print is pretty straight forward setting the variables and then print the allocated string. I make sure that there are no null bytes by using xor whenever i start a new variable.
 
-The message i sent looks like this:
+In the ls call I convert all spaces in my allocated string to Null bytes that terminates the strings. Then ececve is called to execute ls with arguments "-l".
 
-\lstinputlisting[language=HTML]{../part1.txt}
-\subsection{Attack B}
-The goal here was to create a local HTML file that a user opens. Th escript is the supposed to send coins to another uer named "you". The user is already logged in to barbar bar.
+\subsection{Exercise 2}
+I fork as the first thing.
+\subsubsection{parent}
+The parent first test if eax is not 0, by using "test eax,eax". If it's the parent it jumps to a sections that executes waitpid which waits for the child to terminate. Once the child has terminated it calls uname -a like I did in exercise 1.
+\subsubsection{child}
+I initiate ecx as 97, which is "a". Then it loops over putting the next letter in the  alphabet on the stack and prints that one character. untill the character printed is character 122, which is z and the last letter in the alphabet. Then it teminates.
 
-I accomplished this in the same was as attack A. Only difference was, that I used a function to catch a return value from submitting the form, that was sending the user to http://localhost/transfer.
+\subsection{exercise 3}
+I fork first thing as before.
+\subsubsection{parent}
+same as exercise 2
+\subsubsection{child}
+Initially push a counter on the stack. Then it prints "100\textbackslash n". Then i create the values for a string that would print 99 using xor with to mitigate null bytes. I then loop over that that value and manipulate it so when the "ones" reach "0" i decrease the "tens" and reset the "ones" to "9". This continues till the counter i made at the start reaches 1, and I terminate the child.
 
+Here i could have reduced the byte count by implementing a generic integer printer, but I have no idea if I was able to do that.
 
-\lstinputlisting[language=HTML]{../part2.html}
-
-\section{White boxing}
-\subsection{Objective 1}
-I needed to find a list of users and their password. I found that using the messge system I could copletly overwrite was would be put into the message field. So i created an sql that gathered all users, passwords, and their salt and placed it in the message field. I just sent a message to "you" with the following message in the headline:
-
-\lstinputlisting[language=HTML, firstline=4, lastline=9]{../whiteboxing.txt}
-This got me a result that looks like 
-\lstinputlisting[language=HTML, firstline=12, lastline=18]{../whiteboxing.txt}
-Which is formated like:\\
-Username\&Password\&Salt
-
-\subsection{Objective B}
-I needed to replace the password of the user "br0ns". I decided to change the password to mastermind, which is the same password used by the user "you". To do this i needed an update query. In index.php there is an query to update the profile of a user. I used this to update more than just the profile, and changed it so it did not update the current users variables, but the variables of "br0ns".
-
-The query typed into the update profile box was this:
-\lstinputlisting[language=HTML, firstline=23, lastline=24]{../whiteboxing.txt}
+My jump to the done section created a null byte, so I had to move it to the top, which makes no sense, but it removed the null byte.
 
 
-\section{Fixing the attacks}
-\subsection{Attack A}
-To fix attack A, i copied the javascript sanitation from elsewhere in the code, and put it on both the headline and the message when viewing messages. I copied the sanitation from the sanitation of headlines in messages.php.
-\subsection{Attack B}
-To fix attack B, I check whether or not the transfer is initiated from "http:/localhost/transfer.php" which is the usual referrer. This can probably still be exploited, by messing the browser or some other hacks, but it fixes my exploit. The added check when making a transfer is this:
-\lstinputlisting[language=HTML, firstline=27, lastline=27]{../fixes.txt}
-\subsection{SQL attack}
-To fix my SQL injections, I simply need to prepare the statements. To fix the find users attack, I converted the message post to look like this:
-\lstinputlisting[language=HTML, firstline=46, lastline=53]{../fixes.txt}
 
-\section{Appendix}
-Attack A is located in part1.txt
 
-Attack B is located in part2.html
-
-Both whiteboxing attacks are located in whiteboxing.txt
-
-Fixes are shortly explained in fixes.txt
 
 
 
