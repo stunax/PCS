@@ -1,0 +1,117 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage [danish]{babel}
+\usepackage[a4paper, hmargin={2.8cm, 2.8cm}, vmargin={2.5cm, 2.5cm}]{geometry}
+\usepackage{eso-pic} % \AddToShipoutPicture
+\usepackage{graphicx} % \includegraphics
+\linespread{1.2}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{amsfonts}
+\usepackage{listings}
+\lstset{literate=
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\EUR}}1 {£}{{\pounds}}1
+}
+\author{
+\Large{dpj482}\\
+    \\ \texttt{}
+}
+
+\title{
+  \vspace{3cm}
+  \Huge{PCS assignment 2} \\
+  \Large{Christian Møllgaard}\\
+}
+\usepackage{natbib}
+\usepackage{graphicx}
+
+\begin{document}
+
+%% Change `ku-farve` to `nat-farve` to use SCIENCE's old colors or
+%% `natbio-farve` to use SCIENCE's new colors and logo.
+\AddToShipoutPicture*{\put(0,0){\includegraphics*[viewport=0 0 700 600]{natbio-farve}}}
+\AddToShipoutPicture*{\put(0,602){\includegraphics*[viewport=0 600 700 1600]{natbio-farve}}}
+
+%% Change `ku-en` to `nat-en` to use the `Faculty of Science` header
+\AddToShipoutPicture*{\put(0,0){\includegraphics*{nat-en}}}
+
+\clearpage\maketitle
+\thispagestyle{empty}
+
+\newpage
+\section{Shellcode}
+I have chosen to complete exercise 1,2, and 3
+\subsection{exercise 1}
+After a talk with kristoffer, we decided to use ls with option -l instead of WAll, because WAll had another setup on my system. 
+
+I have already allocated the space for both the hello world print and the string used to call ls. I leave a space between "/bin/ls" and "-l" and after "-l" because i later use this already allocated space for the null bytes required for the strings.
+
+The print is pretty straight forward setting the variables and then print the allocated string. I make sure that there are no null bytes by using xor whenever i start a new variable.
+
+In the ls call I convert all spaces in my allocated string to Null bytes that terminates the strings. Then ececve is called to execute ls with arguments "-l".
+
+\subsection{Exercise 2}
+I fork as the first thing.
+\subsubsection{parent}
+The parent first test if eax is not 0, by using "test eax,eax". If it's the parent it jumps to a sections that executes waitpid which waits for the child to terminate. Once the child has terminated it calls uname -a like I did in exercise 1.
+\subsubsection{child}
+I initiate ecx as 97, which is "a". Then it loops over putting the next letter in the  alphabet on the stack and prints that one character. untill the character printed is character 122, which is z and the last letter in the alphabet. Then it teminates.
+
+\subsection{exercise 3}
+I fork first thing as before.
+\subsubsection{parent}
+same as exercise 2
+\subsubsection{child}
+Initially push a counter on the stack. Then it prints "100\textbackslash n". Then i create the values for a string that would print 99 using xor with to mitigate null bytes. I then loop over that that value and manipulate it so when the "ones" reach "0" i decrease the "tens" and reset the "ones" to "9". This continues till the counter i made at the start reaches 1, and I terminate the child.
+
+Here i could have reduced the byte count by implementing a generic integer printer, but I have no idea if I was able to do that.
+
+My jump to the done section created a null byte, so I had to move it to the top, which makes no sense, but it removed the null byte.
+
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

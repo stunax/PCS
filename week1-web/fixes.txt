@@ -24,7 +24,7 @@ sanitise message showing.
 
 
 Added check to transfer post.
-&& strcmp($_SERVER['HTTP_REFERER'], 'http://localhost/transfer.php') == 0
+strcmp($_SERVER['HTTP_REFERER'], 'http://localhost/transfer.php') == 0
 
 
 
@@ -41,7 +41,7 @@ $sql = "INSERT INTO Message (FromID, ToID, Headline, Message) " .
 if (!$db->query($sql)) {
     die("Making message failed: (" . $db->errno . ") " . $db->error);
 }
-
+>>>>>>>>>>
 
 $sql2 = "INSERT INTO Message (FromID, ToID, Headline, Message) " .
         " VALUES (?,?,?,?)";

@@ -36,7 +36,7 @@ parent:
   mov al, SYS_waitpid ; wait for child
   int 0x80
   call uname
-  db "/bin/uname -a " ;xxxx is pointer to path, YYYY is char pointer array, ZZZZ becomes nulls
+  db "/bin/uname -a " 
 
 child:
   xor ecx,ecx
@@ -63,7 +63,7 @@ print: ; print one char. Requires ecx set to point at char to print
   jmp prepchar
 
 done:
-    xor ebx, ebx
-    xor eax, eax
-    mov al, SYS_exit
-    int 0x80
+  xor ebx, ebx
+  xor eax, eax
+  mov al, SYS_exit
+  int 0x80

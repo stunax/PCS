@@ -64,8 +64,8 @@ hundreds:
   mov bl, STD_OUT ; add std_out
   int 0x80 ; write
   pop ecx ; Does nothing,
-  mov ecx, 0x01083838
-  xor ecx, 0x01020201
+  mov ecx, 0x01083838 ; avoid null bytes
+  xor ecx, 0x01020201 ; xor values missing, and values not supposed to be there.
 tens:
   xor eax,eax ; eax is tens
   mov al, cl
@@ -93,11 +93,11 @@ tensAlways:
   xor ebx, ebx ; null ebx
   mov bl, STD_OUT ; add std_out
   int 0x80 ; write
-  xor edx,edx ; check if 100 is printed.
+  xor edx,edx ; check if 1 is printed.
   mov dl,1
   pop ecx
   pop ebx
-  cmp ebx, edx ; if it's counter is 1, then jump to done
+  cmp ebx, edx ; if the counter is 1, then jump to done
   je done
   add ebx,-1
   push ebx
