@@ -183,50 +183,89 @@ Disassembly of section .text:
  804857f:	90                   	nop
 
 08048580 <readline>:
+;loads characters from input char array into buffer.
+;does so one at a time. Checks if null or newline, and exits when it hits those.
+; takes 1 argument
+; arg1 							ebp+0x8
+; retval						ebp+0x4
+; old ebp 						ebp
+; lvar 1 ; init arg1 			ebp-0x4
+; lvar 3 ; current char			ebp-0x5
+; lvar 2 ; init 0	;counter;	ebp-0xc
+; lvar 4 ; init 0	; unused;	ebp-0x10
+; lvar 5 ; init 1	; unused;	ebp-0x14
  8048580:	55                   	push   ebp
  8048581:	89 e5                	mov    ebp,esp
  8048583:	83 ec 28             	sub    esp,0x28
+ ; load arg1 into eax
  8048586:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+ ;init lvar 1
  8048589:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
+ ; init lvar 2
  804858c:	c7 45 f4 00 00 00 00 	mov    DWORD PTR [ebp-0xc],0x0
+ ; start of loop
  8048593:	b8 00 00 00 00       	mov    eax,0x0
  8048598:	8d 4d fb             	lea    ecx,[ebp-0x5]
  804859b:	ba 01 00 00 00       	mov    edx,0x1
+ ;prep args for read
+ ; arg1 = 0
  80485a0:	c7 04 24 00 00 00 00 	mov    DWORD PTR [esp],0x0
+ ; arg2 = pointer to lvar 3
  80485a7:	89 4c 24 04          	mov    DWORD PTR [esp+0x4],ecx
+ ; arg3 = 1
  80485ab:	c7 44 24 08 01 00 00 	mov    DWORD PTR [esp+0x8],0x1
  80485b2:	00 
+ ;
  80485b3:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
  80485b6:	89 55 ec             	mov    DWORD PTR [ebp-0x14],edx
  80485b9:	e8 32 fe ff ff       	call   80483f0 <read@plt>
+ ;check that read equals 0. If it has reached end of char array. and exits
  80485be:	3d 00 00 00 00       	cmp    eax,0x0
  80485c3:	0f 8e 30 00 00 00    	jle    80485f9 <readline+0x79>
+ ;load single byte
  80485c9:	0f be 45 fb          	movsx  eax,BYTE PTR [ebp-0x5]
+ ;check if it's 0xa. heck if new line
  80485cd:	3d 0a 00 00 00       	cmp    eax,0xa
+ ;check that 0xa, if not so then skip stop jump
  80485d2:	0f 85 05 00 00 00    	jne    80485dd <readline+0x5d>
  80485d8:	e9 1c 00 00 00       	jmp    80485f9 <readline+0x79>
+ ; load lvar 3
  80485dd:	8a 45 fb             	mov    al,BYTE PTR [ebp-0x5]
+ ;load lvar 2
  80485e0:	8b 4d f4             	mov    ecx,DWORD PTR [ebp-0xc]
+ ;copy lvar2 into edx
  80485e3:	89 ca                	mov    edx,ecx
+ ;increase lvar2 but keep old value in ecx
  80485e5:	81 c2 01 00 00 00    	add    edx,0x1
  80485eb:	89 55 f4             	mov    DWORD PTR [ebp-0xc],edx
+ ;load lvar 1
  80485ee:	8b 55 fc             	mov    edx,DWORD PTR [ebp-0x4]
+ ;put lvar 1 into [lvar 1 + lvar 2] the byte at lvar 3
  80485f1:	88 04 0a             	mov    BYTE PTR [edx+ecx*1],al
  80485f4:	e9 9a ff ff ff       	jmp    8048593 <readline+0x13>
+ ; function epilogue
  80485f9:	83 c4 28             	add    esp,0x28
  80485fc:	5d                   	pop    ebp
  80485fd:	c3                   	ret    
  80485fe:	66 90                	xchg   ax,ax
 
 08048600 <main>:
+ ; string2 ; formated input?;	0x8049a5c
+ ; format string1; first format;0x80487f0
+ ; format string2; 			;	0x804883c
  ; static var1 ; 				0x80487d0
+ ; static string1;				0x804884b
  ; stack cookie ; 				ebp-0x4
- ; lvar3 = char array ; 		ebp-0x84
- ; lvar2 = 0 ; 					ebp-0x88
+ ; lvar3 = char array buffer ;	ebp-0x84
+ ; lvar2 = 0 ; Never used		ebp-0x88
  ; lvar1 = amount of args' ; 	ebp-0x8c
- ; lvar0 = arg 1 ; 				ebp-0x90
+ ; lvar0 = arg 1 ; 	never used;	ebp-0x90
  ; lvar4 = pointer to lvar3		ebp-0x94
  ; lvar5 = result of memset	;	ebp-0x98
+ ; lvar6 = result of puts	;	ebp-0x9c
+ ; lvar7 = result of sprintf;	ebp-0xA0
+ ; lvar8 = result of write	;	ebp-0xA4
+ ; lvar9 = result of sprintf2;	ebp-0xA8
  8048600:	55                   	push   ebp
  8048601:	89 e5                	mov    ebp,esp
  ;claim 184 bytes
@@ -243,11 +282,13 @@ Disassembly of section .text:
  8048620:	00 00 00 
  ;init lvar1 as amount of arguments
  8048623:	89 8d 74 ff ff ff    	mov    DWORD PTR [ebp-0x8c],ecx
- ;init lvar0 as arg1
+ ;init lvar0 as arg1 never used
  8048629:	89 85 70 ff ff ff    	mov    DWORD PTR [ebp-0x90],eax
  804862f:	89 e0                	mov    eax,esp
- ;load pointer to lvar2 + 4 bytes
+ ;load pointer to lvar3
  8048631:	8d 8d 7c ff ff ff    	lea    ecx,[ebp-0x84]
+
+ ;fill char buffer with null
  ;push pointer to lvar3 as first argument to memset
  8048637:	89 08                	mov    DWORD PTR [eax],ecx
  ;set third argument to 128 for memset
@@ -258,48 +299,79 @@ Disassembly of section .text:
  8048647:	89 8d 6c ff ff ff    	mov    DWORD PTR [ebp-0x94],ecx
  804864d:	e8 0e fe ff ff       	call   8048460 <memset@plt>
  8048652:	89 e1                	mov    ecx,esp
+ 
+ ;write what is thy name string to std_out
  ;push pointer to string as arg 2 for puts
  8048654:	c7 01 d0 87 04 08    	mov    DWORD PTR [ecx],0x80487d0
  ;save memset result to lvar5
  804865a:	89 85 68 ff ff ff    	mov    DWORD PTR [ebp-0x98],eax
  8048660:	e8 ab fd ff ff       	call   8048410 <puts@plt>
  8048665:	89 e1                	mov    ecx,esp
+ ;Read user input into char buffer
+ ;load lvar4 into edx
  8048667:	8b 95 6c ff ff ff    	mov    edx,DWORD PTR [ebp-0x94]
+ ; push pointer to lvar2 + 4 bytes
  804866d:	89 11                	mov    DWORD PTR [ecx],edx
+ ;save puts result as lvar6
  804866f:	89 85 64 ff ff ff    	mov    DWORD PTR [ebp-0x9c],eax
+ ; read first user input.
  8048675:	e8 06 ff ff ff       	call   8048580 <readline>
  804867a:	89 e0                	mov    eax,esp
+ ;load lvar4
  804867c:	8b 8d 6c ff ff ff    	mov    ecx,DWORD PTR [ebp-0x94]
+ ; push lvar4 as arg3 for sprintf
  8048682:	89 48 08             	mov    DWORD PTR [eax+0x8],ecx
+ ; push pointer to format string
  8048685:	c7 40 04 f0 87 04 08 	mov    DWORD PTR [eax+0x4],0x80487f0
+ ; push pointer to formatted input string
  804868c:	c7 00 5c 9a 04 08    	mov    DWORD PTR [eax],0x8049a5c
  8048692:	e8 d9 fd ff ff       	call   8048470 <sprintf@plt>
+
+ ;print formated input string.
  8048697:	89 e1                	mov    ecx,esp
+ ;push pointer to input string and get length of formatted input string
  8048699:	c7 01 5c 9a 04 08    	mov    DWORD PTR [ecx],0x8049a5c
+ ;save result of sprintf as lvar7
  804869f:	89 85 60 ff ff ff    	mov    DWORD PTR [ebp-0xa0],eax
  80486a5:	e8 86 fd ff ff       	call   8048430 <strlen@plt>
  80486aa:	89 e1                	mov    ecx,esp
+ ;push length of input string as arg3 for write
  80486ac:	89 41 08             	mov    DWORD PTR [ecx+0x8],eax
+ ;push pointer to input string as arg 2 for write
  80486af:	c7 41 04 5c 9a 04 08 	mov    DWORD PTR [ecx+0x4],0x8049a5c
+ ;push std_out as file descriptor for write
  80486b6:	c7 01 01 00 00 00    	mov    DWORD PTR [ecx],0x1
  80486bc:	e8 8f fd ff ff       	call   8048450 <write@plt>
  80486c1:	89 e1                	mov    ecx,esp
+ ;load lvar4
  80486c3:	8b 95 6c ff ff ff    	mov    edx,DWORD PTR [ebp-0x94]
+ ; push it as argument 1 for input for readline
  80486c9:	89 11                	mov    DWORD PTR [ecx],edx
+ ; save write result to lvar 8
  80486cb:	89 85 5c ff ff ff    	mov    DWORD PTR [ebp-0xa4],eax
  80486d1:	e8 aa fe ff ff       	call   8048580 <readline>
  80486d6:	89 e0                	mov    eax,esp
+ ;load lvar 4
  80486d8:	8b 8d 6c ff ff ff    	mov    ecx,DWORD PTR [ebp-0x94]
+ ;push lvar 4 as arg 3 for sprintf
  80486de:	89 48 08             	mov    DWORD PTR [eax+0x8],ecx
+ ; push format string 2 as argument for sprintf
  80486e1:	c7 40 04 3c 88 04 08 	mov    DWORD PTR [eax+0x4],0x804883c
+ ; push point to string 2 as arg 1 for sprintf
  80486e8:	c7 00 5c 9a 04 08    	mov    DWORD PTR [eax],0x8049a5c
  80486ee:	e8 7d fd ff ff       	call   8048470 <sprintf@plt>
  80486f3:	89 e1                	mov    ecx,esp
+ ; put 0x1e as argument for write
  80486f5:	c7 41 08 1e 00 00 00 	mov    DWORD PTR [ecx+0x8],0x1e
+ ; put static string as arg 2
  80486fc:	c7 41 04 4b 88 04 08 	mov    DWORD PTR [ecx+0x4],0x804884b
+ ;set file descriptor as 1 ; std_out
  8048703:	c7 01 01 00 00 00    	mov    DWORD PTR [ecx],0x1
  8048709:	89 85 58 ff ff ff    	mov    DWORD PTR [ebp-0xa8],eax
  804870f:	e8 3c fd ff ff       	call   8048450 <write@plt>
+
+
+ ;check coockies
  8048714:	65 8b 0d 14 00 00 00 	mov    ecx,DWORD PTR gs:0x14
  804871b:	3b 4d fc             	cmp    ecx,DWORD PTR [ebp-0x4]
  804871e:	89 85 54 ff ff ff    	mov    DWORD PTR [ebp-0xac],eax
