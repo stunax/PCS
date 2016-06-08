@@ -280,24 +280,38 @@ Disassembly of section .text:
  804873c:	c3                   	ret    
 
 0804873d <get_lines>:
+; ebp-0x1010 ; line counter.
+; ebp-0x1014 ; pointer to current struct
+; 
  804873d:	55                   	push   ebp
  804873e:	89 e5                	mov    ebp,esp
  8048740:	53                   	push   ebx
  8048741:	81 ec 24 10 00 00    	sub    esp,0x1024
+ ; set line counter
  8048747:	c7 85 f0 ef ff ff 00 	mov    DWORD PTR [ebp-0x1010],0x0
  804874e:	00 00 00 
+ ;check loop
  8048751:	e9 ae 00 00 00       	jmp    8048804 <get_lines+0xc7>
+ ; LOOP START
+ ; allocate space 
  8048756:	c7 04 24 0c 00 00 00 	mov    DWORD PTR [esp],0xc
+ ;malloc1  some struct?
  804875d:	e8 fe fc ff ff       	call   8048460 <malloc@plt>
+ ; save pointer to allocated space
  8048762:	89 85 ec ef ff ff    	mov    DWORD PTR [ebp-0x1014],eax
+ ;load line counter and pointer to malloc1
  8048768:	8b 85 ec ef ff ff    	mov    eax,DWORD PTR [ebp-0x1014]
  804876e:	8b 95 f0 ef ff ff    	mov    edx,DWORD PTR [ebp-0x1010]
+ ;save line number into struct.
  8048774:	89 50 08             	mov    DWORD PTR [eax+0x8],edx
+ ; arg 2 for get line.
  8048777:	c7 44 24 04 00 10 00 	mov    DWORD PTR [esp+0x4],0x1000
  804877e:	00 
+ ;pointer to end of struct
  804877f:	8d 85 ec ef ff ff    	lea    eax,[ebp-0x1014]
  8048785:	83 c0 0c             	add    eax,0xc
  8048788:	89 04 24             	mov    DWORD PTR [esp],eax
+ ; call get line
  804878b:	e8 3b ff ff ff       	call   80486cb <get_line>
  8048790:	89 85 f4 ef ff ff    	mov    DWORD PTR [ebp-0x100c],eax
  8048796:	8b 9d ec ef ff ff    	mov    ebx,DWORD PTR [ebp-0x1014]
