@@ -242,6 +242,8 @@ Disassembly of section .text:
  80486ca:	c3                   	ret    
 
 080486cb <get_line>:
+; goes through loaded file, till it reaches a newline
+; returns file size
  80486cb:	55                   	push   ebp
  80486cc:	89 e5                	mov    ebp,esp
  80486ce:	53                   	push   ebx
@@ -313,12 +315,15 @@ Disassembly of section .text:
  8048788:	89 04 24             	mov    DWORD PTR [esp],eax
  ; call get line
  804878b:	e8 3b ff ff ff       	call   80486cb <get_line>
+ ; save line size into start of struct
  8048790:	89 85 f4 ef ff ff    	mov    DWORD PTR [ebp-0x100c],eax
  8048796:	8b 9d ec ef ff ff    	mov    ebx,DWORD PTR [ebp-0x1014]
  804879c:	8b 85 f4 ef ff ff    	mov    eax,DWORD PTR [ebp-0x100c]
  80487a2:	83 c0 01             	add    eax,0x1
  80487a5:	89 04 24             	mov    DWORD PTR [esp],eax
+ ;allocate space for the line it self.
  80487a8:	e8 b3 fc ff ff       	call   8048460 <malloc@plt>
+ ;save the pointer to the line into the string into the struct
  80487ad:	89 03                	mov    DWORD PTR [ebx],eax
  80487af:	8b 85 ec ef ff ff    	mov    eax,DWORD PTR [ebp-0x1014]
  80487b5:	8b 95 f4 ef ff ff    	mov    edx,DWORD PTR [ebp-0x100c]
@@ -331,6 +336,8 @@ Disassembly of section .text:
  80487d6:	83 c2 0c             	add    edx,0xc
  80487d9:	89 54 24 04          	mov    DWORD PTR [esp+0x4],edx
  80487dd:	89 04 24             	mov    DWORD PTR [esp],eax
+ ;copy the current line into the "global string" containing all strings. 
+ ; This is the overflow
  80487e0:	e8 6b fc ff ff       	call   8048450 <memcpy@plt>
  80487e5:	8b 85 ec ef ff ff    	mov    eax,DWORD PTR [ebp-0x1014]
  80487eb:	8b 10                	mov    edx,DWORD PTR [eax]
@@ -339,6 +346,7 @@ Disassembly of section .text:
  80487f5:	c6 00 00             	mov    BYTE PTR [eax],0x0
  80487f8:	8b 85 ec ef ff ff    	mov    eax,DWORD PTR [ebp-0x1014]
  80487fe:	89 85 f0 ef ff ff    	mov    DWORD PTR [ebp-0x1010],eax
+ ;check if global counter is past file size
  8048804:	8b 15 54 a0 04 08    	mov    edx,DWORD PTR ds:0x804a054
  804880a:	a1 50 a0 04 08       	mov    eax,ds:0x804a050
  804880f:	39 c2                	cmp    edx,eax
