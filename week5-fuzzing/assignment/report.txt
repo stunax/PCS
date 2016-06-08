@@ -1,0 +1,15 @@
+Week 5 assignment
+
+This week assignment consisted of a fuzzing experiment. The goal was to fuz the target program "yairc" to see if we could crash the server in some way.
+The server had a very strict, and therefore easy to fuzz framework.
+
+The main goal was to "hack" the server, but if that was not possible, then at least crash the server somehow.
+
+My take on it, was to fuzz each step of the authentication untill I crashed the server.
+
+I started by fuzzing the HELO SERVER step, to see if any unfourtunate strings would make the server crash. Then i fuzzed the NICK step, and finally i fuzzed the JOINING step. Here i managed using only alphanumeric characters to overflow some variable making the whole thing crash. I did this while using a channel name of about 1000 characters. The problem with this exploit is, that i could make it all crash, but i could not use this information togather information. 
+If I had been able to crash the NICK part, I would have been able to extract information about the conputer, maybe a stack cookie, because I could actually ask "WHO AM I" and make the server print my NICK. This way I could get stack cookie and all other information needed, as the server would be a fork and therefor static.
+
+So I was able to crash te fork of the server, but never the server. I was unable to crash a part that I could really use, But I found out how effective random testing of a service was, at finding bugs in the service even though I used some very crude tools.
+
+I actually heard from other students that NICK was crashable, so I am sad that I was unable to do so, and actually implement a nice hack based on that.

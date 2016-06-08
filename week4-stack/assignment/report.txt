@@ -1,0 +1,44 @@
+Assignment 4
+dpj482
+
+parrot
+To solve parrot i made the buffer overflow in the parse function. For the characters that would overflow the counter, i made it so the next number was the pointer to the return adress. Then the last four bytes of my overflow was the adress of a "ret" instruction. This poped the next variable on the stack and went to the adress stored there. That was a pointer to my input. Found an exploit on the web, There is alink in the exploit, short enough to be contained in the 40'ish bytes that I had available for the exploit and ran /bin/sh.
+
+parse stack:		  address
+stack cookie 		; [ebp-0xc]
+local var 1 		; [ebp-0x4c]
+local var 2 		; [ebp-0x3c]
+local var 3 		; [ebp-0x10] ; loop counter
+local array 1		; [ebp-0x38] to [ebp-0x0d] ; input text
+
+cookiepirate.
+To solve this I overflowed the readlines. The first overflowed by one byte to overwrite the null byte of the stackcookie. This meant that the cookie would get printed back to my exploit that then found it in the recieved text. Then I send my program along with enough text to overflow the stack cookie, ebp, and the return address. The stack cookie I replaced with the cookie I found before, but inserted the missing null byte in front of it to restore it to the original state. The new return adress i set to the formated input string from sprintf with an offset of 0xc bytes to skip the text from the format string. For this exploit i used another shellcode that starts /bin/sh because the other did not work for some reason. 
+
+readline stack:				address
+arg1 						ebp+0x8
+retval						ebp+0x4
+old ebp 					ebp
+lvar 1 ; init arg1 			ebp-0x4
+lvar 3 ; current char		ebp-0x5
+lvar 2 ; init 0	;counter;	ebp-0xc
+lvar 4 ; init 0	; unused;	ebp-0x10
+lvar 5 ; init 1	; unused;	ebp-0x14
+
+main stack:						address
+string2 exploit location		0x8049a68
+string2 ; formated input?;		0x8049a5c
+format string1; first format;	0x80487f0
+format string2; 			;	0x804883c
+static var1 ; 					0x80487d0
+static string1;					0x804884b
+stack cookie ; 					ebp-0x4
+lvar3 = char array buffer ;		ebp-0x84
+lvar2 = 0 ; Never used			ebp-0x88
+lvar1 = amount of args' ; 		ebp-0x8c
+lvar0 = arg 1 ; 	never used;	ebp-0x90
+lvar4 = pointer to lvar3		ebp-0x94
+lvar5 = result of memset	;	ebp-0x98
+lvar6 = result of puts	;		ebp-0x9c
+lvar7 = result of sprintf;		ebp-0xA0
+lvar8 = result of write	;		ebp-0xA4
+lvar9 = result of sprintf2;		ebp-0xA8
