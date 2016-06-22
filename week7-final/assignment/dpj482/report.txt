@@ -1,0 +1,30 @@
+
+The buffer overflow exploit here requires that it is in the same folder as a binary version of the pcswebchat.
+
+Binary exploits
+Both my bomary exploits are exploiting the cowsay function. The stack can be seen with the commented assembly.
+
+Format string exploit
+Sending raw data to the server I am able to escape the format string. This enables me to end the cowsay call, and call what ever and pipe the result back to me at the same time. This could be used for a remote terminal with a small amount of effort, which gives me almost complete control of the server. Using the "$IFS" call for spaces, I can create almost any command, with some exceptions, as I am limited by the HTTP protocol. The example that is run, will send the database.db to the user, using cat to escape various null bytes and such.
+
+Buffer overflow exploit.
+In this exploit, I overflow the buffer made available to the sprintf. After I get control of the stack, I would have liked to used my input string to run commands, but as I am unable to find the string on the stack, I instead allocate a single char on the stack at a time. I do this by finding the required byte followed by a null byte in the binary. This char then gets copied to a location in the bss section, followed by null. I then contiue to overwrite the last null byte with the next required character untill i reach the end of the command I want to execute. This command is then called with a system call.
+
+This procedure have some limitations. I have to find all characters as bytes followed by NULL, which sometimes is not possible. So I can run almost any command, as long as I can find the character followed by null in the binary.
+This limitation is annoying, as I was unable to find any "&" in the binary, which is how I would have send back the output of the system call.
+
+
+
+Web exploit
+My web exploit exploits the use of the eval function. This functions lets the attacker run almost any javascript in the browser. 
+The code I run, is code that sets the message box to their token, and sends it to the channel. The current version of the exploit lets the user continue, and does not show them that they send their token to the channel, because i do not used the send message, but rather makes a post request that does not update the messages. This exploit could maybe send the token to another service instead of sending the token to the same server.
+
+To run exploit run web_doit.py
+
+function toJSON(json) {
+    // This snippet is from W3Schools so it must be legit
+    // I make eval set the message value to token, and call send_message
+    return eval("(" + json + ")");
+}
+
+This exploit causes a heap overflow also, so it could be possible to abuse this to. Running it once locally will cause the server to crash after a minute or so, and running it a few times causes it to crash directly.

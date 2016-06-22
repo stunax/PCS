@@ -43,7 +43,7 @@ context(arch='i386', os='linux')
 # ebp + 4  		; gadget 1 ;ret address
 # ebp 			; garbage
 # ...
-# ebp - 0x100c 	; Char buffer to overflow
+# ebp - 0x1008 	; Char buffer to overflow
 
 
 
