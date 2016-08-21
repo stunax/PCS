@@ -5,7 +5,7 @@ Binary exploits
 Both my bomary exploits are exploiting the cowsay function. The stack can be seen with the commented assembly.
 
 Format string exploit
-Sending raw data to the server I am able to escape the format string. This enables me to end the cowsay call, and call what ever and pipe the result back to me at the same time. This could be used for a remote terminal with a small amount of effort, which gives me almost complete control of the server. Using the "$IFS" call for spaces, I can create almost any command, with some exceptions, as I am limited by the HTTP protocol. The example that is run, will send the database.db to the user, using cat to escape various null bytes and such.
+Sending raw data to the server I am able to escape the format string. This enables me to end the cowsay call, and call what ever and pipe the result back to me at the same time. This could be used for a remote terminal with a small amount of effort, which gives me almost complete control of the server. Using the "$IFS" call for spaces, I can create almost any command, with some exceptions, as I am limited by the HTTP protocol. The example that is run, will send the database.db to the user, using cat to escape various null bytes and such. This exploit does NOT crash the server.
 
 Buffer overflow exploit.
 In this exploit, I overflow the buffer made available to the sprintf. After I get control of the stack, I would have liked to used my input string to run commands, but as I am unable to find the string on the stack, I instead allocate a single char on the stack at a time. I do this by finding the required byte followed by a null byte in the binary. This char then gets copied to a location in the bss section, followed by null. I then contiue to overwrite the last null byte with the next required character untill i reach the end of the command I want to execute. This command is then called with a system call.
@@ -13,7 +13,7 @@ In this exploit, I overflow the buffer made available to the sprintf. After I ge
 This procedure have some limitations. I have to find all characters as bytes followed by NULL, which sometimes is not possible. So I can run almost any command, as long as I can find the character followed by null in the binary.
 This limitation is annoying, as I was unable to find any "&" in the binary, which is how I would have send back the output of the system call.
 
-
+This exploit causes the server to crash.
 
 Web exploit
 My web exploit exploits the use of the eval function. This functions lets the attacker run almost any javascript in the browser. 

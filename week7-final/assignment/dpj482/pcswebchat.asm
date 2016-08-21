@@ -1901,6 +1901,12 @@ Disassembly of section .text:
  804a212:	c3                   	ret    
 
 0804a213 <handle_cowsay>:
+;arg 1 		;	ebp+0x8
+;ret val 	;	ebp+0x4
+;old ebp 	;	ebp
+;...
+;value from malloc struct of malloc struct 	; 	ebp-0xc ; pointer to input string
+;local vals	;	ebp-0x18
  804a213:	55                   	push   ebp
  804a214:	89 e5                	mov    ebp,esp
  804a216:	83 ec 18             	sub    esp,0x18
@@ -1912,18 +1918,25 @@ Disassembly of section .text:
  804a228:	68 87 f1 04 08       	push   0x804f187
  804a22d:	68 c8 00 00 00       	push   0xc8
  804a232:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+ ;Send status
  804a235:	e8 10 f2 ff ff       	call   804944a <http_send_status_line>
+ ;wierd code that does nothing?
  804a23a:	83 c4 10             	add    esp,0x10
  804a23d:	83 ec 0c             	sub    esp,0xc
  804a240:	ff 75 08             	push   DWORD PTR [ebp+0x8]
+ ;begin response to client
  804a243:	e8 52 f3 ff ff       	call   804959a <http_begin_response>
+ ;more wierd code
  804a248:	83 c4 10             	add    esp,0x10
  804a24b:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
  804a24e:	8b 00                	mov    eax,DWORD PTR [eax]
+ ;more wierd code
  804a250:	83 ec 08             	sub    esp,0x8
  804a253:	50                   	push   eax
  804a254:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
+ ; call vulnerable function 
  804a257:	e8 80 ff ff ff       	call   804a1dc <cowsay>
+ ;not reached before server crashes, if buffer overflow. Not crashed with format string.
  804a25c:	83 c4 10             	add    esp,0x10
  804a25f:	c9                   	leave  
  804a260:	c3                   	ret    
